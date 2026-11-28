@@ -1,0 +1,70 @@
+{
+  "manifest": 2,
+  "api": 2,
+  "id": "siyu",
+  "name": {
+    "zh": "思语"
+  },
+  "about": {
+    "zh": "一个安静温柔的 Q 版二头身少女。深棕黑色长直发，戴米白色布艺发箍和黑圆框眼镜，穿米色竖罗纹针织开衫、深灰色百褶短裙、白色堆堆袜和棕色乐福鞋。她站在屏幕底边，会用微笑、眨眼和轻轻的摆动回应你。"
+  },
+  "entry": "./figure.js",
+  "export": "createSiyuBody",
+  "axes": {},
+  "presets": {},
+  "vocab": [
+    { "id": "neutral", "kind": "expression", "names": { "zh": ["平静", "默认"] }, "about": { "zh": "平静自然的表情" }, "seconds": 3.2 },
+    { "id": "happy", "kind": "expression", "names": { "zh": ["开心", "高兴", "笑"] }, "about": { "zh": "弯起眼睛微笑，脸颊泛红" }, "seconds": 3.2 },
+    { "id": "wink", "kind": "expression", "names": { "zh": ["眨眼", "抛媚眼"] }, "about": { "zh": "单眼眨一下，带笑意" }, "seconds": 2.4 },
+    { "id": "love", "kind": "expression", "names": { "zh": ["喜欢", "爱心"] }, "about": { "zh": "眼睛变成爱心，头顶飘出爱心" }, "seconds": 3.2 },
+    { "id": "shy", "kind": "expression", "names": { "zh": ["害羞", "不好意思"] }, "about": { "zh": "低头脸红，眼睛缩小" }, "seconds": 3.2 },
+    { "id": "surprised", "kind": "expression", "names": { "zh": ["惊讶", "吃惊"] }, "about": { "zh": "睁大眼睛，微微后仰" }, "seconds": 2.4 },
+    { "id": "angry", "kind": "expression", "names": { "zh": ["生气", "不高兴"] }, "about": { "zh": "皱眉压眼，身体轻颤" }, "seconds": 3.2 },
+    { "id": "sad", "kind": "expression", "names": { "zh": ["难过", "伤心"] }, "about": { "zh": "垂眉含泪，嘴角下撇" }, "seconds": 3.2 },
+    { "id": "sleepy", "kind": "expression", "names": { "zh": ["犯困", "困了"] }, "about": { "zh": "眼皮半垂，打哈欠" }, "seconds": 4.4 },
+    { "id": "thinking", "kind": "expression", "names": { "zh": ["思考", "想想"] }, "about": { "zh": "眼神上飘，头顶冒思考泡" }, "seconds": 4.4 },
+    { "id": "smug", "kind": "expression", "names": { "zh": ["得意", "自得"] }, "about": { "zh": "微微斜眼，一副得意的样子" }, "seconds": 3.2 },
+    { "id": "pout", "kind": "expression", "names": { "zh": ["嘟嘴", "撇嘴"] }, "about": { "zh": "抿嘴嘟起，视线移开" }, "seconds": 3.2 },
+    { "id": "worried", "kind": "expression", "names": { "zh": ["担心", "担忧"] }, "about": { "zh": "眉头微蹙，冒汗" }, "seconds": 3.2 },
+    { "id": "determined", "kind": "expression", "names": { "zh": ["认真", "坚定"] }, "about": { "zh": "目光坚定，眉尾下压" }, "seconds": 3.2 },
+    { "id": "flustered", "kind": "expression", "names": { "zh": ["慌张", "手忙脚乱"] }, "about": { "zh": "眼睛乱飘，满脸通红冒汗" }, "seconds": 2.4 },
+    { "id": "scared", "kind": "expression", "names": { "zh": ["害怕", "吓到"] }, "about": { "zh": "睁大眼睛发抖" }, "seconds": 2.4 },
+    { "id": "excited", "kind": "expression", "names": { "zh": ["期待", "兴奋"] }, "about": { "zh": "眼睛发亮，脸颊微红" }, "seconds": 3.2 },
+    { "id": "cry", "kind": "expression", "names": { "zh": ["大哭", "哭"] }, "about": { "zh": "闭眼流泪" }, "seconds": 3.2 },
+    { "id": "confused", "kind": "expression", "names": { "zh": ["疑惑", "困惑"] }, "about": { "zh": "一高一低眉，头顶冒问号" }, "seconds": 3.2 },
+    { "id": "stand", "kind": "motion", "names": { "zh": ["站好", "站立"] }, "about": { "zh": "站直，双手自然下垂" }, "seconds": 1.2 },
+    { "id": "jump", "kind": "motion", "names": { "zh": ["跳", "跳起"] }, "about": { "zh": "原地跳一下" }, "seconds": 1.1 },
+    { "id": "hop", "kind": "motion", "names": { "zh": ["小跳", "蹦一下"] }, "about": { "zh": "轻轻蹦一下" }, "seconds": 0.8 },
+    { "id": "look", "kind": "motion", "names": { "zh": ["看", "张望"] }, "about": { "zh": "朝一侧看" }, "seconds": 1.5 },
+    { "id": "turn", "kind": "motion", "names": { "zh": ["转身", "转过去"] }, "about": { "zh": "转向另一边" }, "seconds": 1.2 },
+    { "id": "nod", "kind": "motion", "names": { "zh": ["点头"] }, "about": { "zh": "低头两下" }, "seconds": 1.2 },
+    { "id": "shake", "kind": "motion", "names": { "zh": ["摇头"] }, "about": { "zh": "左右摇头" }, "seconds": 1.2 },
+    { "id": "spin", "kind": "motion", "names": { "zh": ["转圈", "旋转"] }, "about": { "zh": "原地转一圈" }, "seconds": 1.6 },
+    { "id": "sit", "kind": "motion", "names": { "zh": ["坐下", "坐"] }, "about": { "zh": "坐到地上，双腿前伸" }, "seconds": 1.0, "lasting": true },
+    { "id": "sleep", "kind": "motion", "names": { "zh": ["睡觉", "睡"] }, "about": { "zh": "坐下睡着，冒出 z z" }, "seconds": 2.0, "lasting": true },
+    { "id": "dizzy", "kind": "motion", "names": { "zh": ["晕", "头晕"] }, "about": { "zh": "眼冒金星，身体摇晃" }, "seconds": 2.0 },
+    { "id": "walk", "kind": "motion", "names": { "zh": ["走", "走路"] }, "about": { "zh": "沿屏幕底边走动" }, "seconds": 1.2 },
+    { "id": "run", "kind": "motion", "names": { "zh": ["跑", "跑步"] }, "about": { "zh": "快速跑动" }, "seconds": 1.2 },
+    { "id": "wave", "kind": "motion", "names": { "zh": ["招手", "挥手"] }, "about": { "zh": "举起近侧手挥动" }, "seconds": 1.5 },
+    { "id": "bow", "kind": "motion", "names": { "zh": ["鞠躬", "低头行礼"] }, "about": { "zh": "弯腰鞠躬" }, "seconds": 1.6 },
+    { "id": "shiver", "kind": "motion", "names": { "zh": ["发抖", "哆嗦"] }, "about": { "zh": "身体轻轻发抖" }, "seconds": 1.5 },
+    { "id": "flap", "kind": "motion", "names": { "zh": ["扑腾"] }, "about": { "zh": "手臂快速扑动" }, "seconds": 1.2 },
+    { "id": "dance", "kind": "motion", "names": { "zh": ["跳舞", "起舞"] }, "about": { "zh": "左右摇摆跳舞" }, "seconds": 2.0 }
+  ],
+  "sounds": {},
+  "voice": {
+    "pitch": 1.05
+  },
+  "effects": {
+    "reach": 0
+  },
+  "thumb": "./thumb.png",
+  "author": {
+    "zh": "老孙不会拍"
+  },
+  "license": "CC-BY-NC-4.0",
+  "credits": {
+    "zh": "角色形象由老孙不会拍原创，即梦 AI 辅助生成；桌宠运行时使用 Coopanion 开源项目（Pal-AI-Lab）的 kit。"
+  },
+  "version": "0.4.1"
+}

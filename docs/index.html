@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coopanion装扮小站 · 老孙 × 思语</title>
+<meta name="description" content="Coopanion 桌宠装扮小站：思语与老孙双人在线待机，桌宠形象包下载、提示词与算法公开。">
+<meta property="og:title" content="Coopanion装扮小站 · 老孙 × 思语">
+<meta property="og:description" content="一个桌宠和他的制造者：真·思语在线试玩，形象包 + 算法公开文档下载">
+<meta property="og:image" content="https://mr-tianyusun.github.io/coopanion-figures/assets/poster.jpg">
+<meta property="og:url" content="https://mr-tianyusun.github.io/coopanion-figures/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://mr-tianyusun.github.io/coopanion-figures/">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="shortcut icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 开机层 -->
+<div id="boot">
+  <div id="bios">
+    <div class="bios-inner">
+      <pre id="biosLines"></pre>
+      <div class="bios-bar"><i id="biosFill"></i></div>
+      <p class="bios-tip">Coopanion OS · 正在开机</p>
+    </div>
+  </div>
+  <video id="introVideo" src="assets/intro.mp4" muted playsinline preload="auto"></video>
+  <button id="skipBtn">跳过 »</button>
+  <div id="posterHold">
+    <img src="assets/poster.jpg" alt="老孙与思语">
+    <div class="boot-title">
+      <p class="bt-main">老孙不会拍 × 思语</p>
+      <p class="bt-sub">一个桌宠 和 他的制造者</p>
+    </div>
+  </div>
+</div>
+
+<!-- 手绘图标库 -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-brain" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.5 C7 3.5 5 7 5 10.5 C5 14 7.5 16 9 16.5 L9 20.5 M12 3.5 C17 3.5 19 7 19 10.5 C19 14 16.5 16 15 16.5 L15 20.5"/>
+      <path d="M9 20.5 L15 20.5 M10 8 Q12 9.5 14 8 M9.5 12 Q12 13.5 14.5 12"/>
+    </g>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 5.5 C6.5 4 9.5 4 12 5.5 C14.5 4 17.5 4 20 5.5 L20 18.5 C17.5 17 14.5 17 12 18.5 C9.5 17 6.5 17 4 18.5 Z"/>
+      <path d="M12 5.5 L12 18.5"/>
+    </g>
+  </symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6.5 C4 5 5 4 6.5 4 L17.5 4 C19 4 20 5 20 6.5 L20 13.5 C20 15 19 16 17.5 16 L10 16 L5.5 20 L5.5 16 C5 16 4 15 4 13.5 Z"/>
+      <circle cx="8.5" cy="10" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="15.5" cy="10" r="1" fill="currentColor" stroke="none"/>
+    </g>
+  </symbol>
+  <symbol id="i-puzzle" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 5 L11 5 C11 3.5 12 2.8 13 2.8 C14 2.8 15 3.5 15 5 L19 5 L19 11 C20.5 11 21.2 12 21.2 13 C21.2 14 20.5 15 19 15 L19 19 L5 19 Z"/>
+    </g>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 3 L14 3 L18.5 7.5 L18.5 21 L6 21 Z M14 3 L14 7.5 L18.5 7.5"/>
+      <path d="M9 12 L15 12 M9 15.5 L15 15.5"/>
+    </g>
+  </symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14.5 6.5 A4.5 4.5 0 1 0 8 12.5 L5 15.5 C4 16.5 4 18 5 19 C6 20 7.5 20 8.5 19 L11.5 16 A4.5 4.5 0 0 0 17.5 9.5 L15 12 L12.5 11.5 L12 9 Z"/>
+    </g>
+  </symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.5" y="7" width="17" height="12" rx="2.5"/>
+      <path d="M8 7 L9.5 4.5 L14.5 4.5 L16 7"/>
+      <circle cx="12" cy="13" r="3.2"/>
+      <circle cx="17.8" cy="9.6" r="0.6" fill="currentColor" stroke="none"/>
+    </g>
+  </symbol>
+  <symbol id="i-doll" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="7"/>
+      <path d="M5.5 8.5 C7 5.5 9 4.5 12 4.5 C15 4.5 17 5.5 18.5 8.5"/>
+      <circle cx="9.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/>
+      <circle cx="14.5" cy="11.5" r="0.9" fill="currentColor" stroke="none"/>
+      <path d="M10.5 15 Q12 16.2 13.5 15"/>
+    </g>
+  </symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.5 6 C3.5 5 4 4.5 5 4.5 L9 4.5 L11 6.5 L19 6.5 C20 6.5 20.5 7 20.5 8 L20.5 17.5 C20.5 18.5 20 19 19 19 L5 19 C4 19 3.5 18.5 3.5 17.5 Z"/>
+    </g>
+  </symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 4 L12 14 M7.5 10 L12 14.5 L16.5 10"/>
+      <path d="M4.5 16.5 L4.5 18 C4.5 19 5 19.5 6 19.5 L18 19.5 C19 19.5 19.5 19 19.5 18 L19.5 16.5"/>
+    </g>
+  </symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2.5 12 C5 7.5 8.5 5.5 12 5.5 C15.5 5.5 19 7.5 21.5 12 C19 16.5 15.5 18.5 12 18.5 C8.5 18.5 5 16.5 2.5 12 Z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </g>
+  </symbol>
+  <symbol id="i-music" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18 V5.5 L19 3 V15.5"/>
+      <ellipse cx="6.5" cy="18" rx="2.5" ry="2"/>
+      <ellipse cx="16.5" cy="15.5" rx="2.5" ry="2"/>
+    </g>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24">
+    <path d="M20 14.5 A8.5 8.5 0 1 1 9.5 4 A6.8 6.8 0 0 0 20 14.5 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-home" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 11 L12 4 L20 11 M6 10 L6 19.5 L18 19.5 L18 10"/>
+      <path d="M10 19.5 L10 14 L14 14 L14 19.5"/>
+    </g>
+  </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3 C7 3 3.5 6.8 3.5 11.3 C3.5 15 5.8 18 9 19.2 C9 18.5 9 17.6 9.2 17 C8 17.2 7.3 17 6.7 16.4 C6 15.8 5.8 15.2 5.7 14.6 C5.5 13.9 5.9 13.6 6.2 13.9 C7 14.6 8 14.6 8.6 14.3 C9.3 13.9 9.8 13.6 10.4 13.5 C11.8 13.3 12.6 12.7 13 12.2 L10.6 12.2 C9.6 12.2 9 11.6 8.8 11 C8.7 10.6 8.9 10.3 9.2 10.2 L10.7 10.2 C10.3 9.6 10.2 8.9 10.5 8.2 L12 9.5 C13.3 9.2 14.5 9.5 15.5 10.3 C16.3 10.9 17.3 11 18.2 10.7 C18.5 10.6 18.7 10.9 18.6 11.3 C18.4 12 17.8 12.5 16.9 12.5 L14.6 12.5 C15.2 13.4 16 13.7 17.5 13.9 C18.4 14 18.7 14.4 18.5 15 C18.2 15.8 17.3 16.4 16 16.6 C16.2 17.3 16.3 18.2 16.2 19 C19.5 17.6 20.5 14.7 20.5 11.3 C20.5 6.8 17 3 12 3 Z"/>
+    </g>
+  </symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"/>
+      <path d="M3.5 12 L20.5 12 M12 3.5 C9.5 6 8.5 9 8.5 12 C8.5 15 9.5 18 12 20.5 C14.5 18 15.5 15 15.5 12 C15.5 9 14.5 6 12 3.5"/>
+    </g>
+  </symbol>
+</svg>
+
+<!-- 桌面 -->
+<div id="desktop">
+  <header class="winbar">
+    <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+    <span class="win-title">Coopanion · 装扮小站</span>
+    <span class="win-clock" id="clock">--:--</span>
+  </header>
+
+  <nav class="win-nav" aria-label="站内导航">
+    <a href="#gallery">形象馆</a>
+    <a href="#plugins">技能插件</a>
+    <a href="#pet">桌宠档案</a>
+    <a href="#downloads">算法下载</a>
+    <a href="#soft">带它回家</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-circle"></div>
+    <div class="hero-inner">
+      <img class="poster" src="assets/poster.jpg" alt="老孙与思语 双人海报">
+      <h1>Coopanion 装扮小站</h1>
+      <p class="hero-sub">桌宠形象 · 技能插件 · 算法公开 · 带它回家</p>
+      <div class="hero-btns">
+        <button class="btn main" data-goto="gallery">看看他们</button>
+        <button class="btn" id="replayBtn">重看出场动画</button>
+      </div>
+      <div class="scroll-cue"><span>向下滚动，看看它住的地方</span><i></i></div>
+    </div>
+  </section>
+
+  <section id="gallery" class="section">
+    <div class="win-head">
+      <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+      <span class="wh-title">01 · 形象馆 — profile.exe</span>
+      <span class="wh-min">— ▢ ×</span>
+    </div>
+    <p class="sec-sub">两套形象，同一个宇宙</p>
+    <div class="flip-grid">
+      <div class="flip">
+        <div class="flip-inner">
+          <div class="face front">
+            <img src="assets/laosun.png" alt="老孙 Q版立绘">
+            <p class="name">老孙</p>
+            <p class="tag">高冷摄影师 · 口头禅「…」</p>
+            <p class="hint">点我翻面 →</p>
+          </div>
+          <div class="face back">
+            <p class="name">档案 · 老孙</p>
+            <ul>
+              <li><b>身份</b>独立游戏制作人 / AI漫剧统筹</li>
+              <li><b>性格</b>表面高冷，实际心软</li>
+              <li><b>装备</b>渔夫帽 · 圆框眼镜 · 复古折叠相机</li>
+              <li><b>口头禅</b>「…」（沉默是金）</li>
+              <li><b>宇宙</b>盐芒芒世界观 · 数字IP本体</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="flip">
+        <div class="flip-inner">
+          <div class="face front">
+            <img src="assets/siyu.png" alt="思语 Q版立绘">
+            <p class="name">思语</p>
+            <p class="tag">卖萌桌宠 · 口头禅「萌妹拯救世界」</p>
+            <p class="hint">点我翻面 →</p>
+          </div>
+          <div class="face back">
+            <p class="name">档案 · 思语</p>
+            <ul>
+              <li><b>身份</b>Coopanion 桌宠 / 第二分身</li>
+              <li><b>性格</b>好奇 · 有点懒 · 心软</li>
+              <li><b>装备</b>米白发箍 · 圆框眼镜 · 头顶气泡</li>
+              <li><b>口头禅</b>「萌妹拯救世界！」（气势要足）</li>
+              <li><b>技能</b>会查资料 会干活 会陪你熬夜</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dress">
+      <h3>装扮间 · 双人待机 <span class="dress-tag">真·桌宠在线</span></h3>
+      <div class="playground">
+        <div class="stage-wrap">
+          <svg id="stage" viewBox="0 0 420 260" aria-label="思语与老孙桌宠双人待机"></svg>
+          <div class="stage-bubble" id="stageBubble">萌妹拯救世界！</div>
+        </div>
+        <p class="play-hint">他们真的住在页面里：安安静静待着，会眨眼、会发呆 —— 点点看，两个人反应不一样。</p>
+      </div>
+      <div class="dress-banner">
+        <h4>思语 says：你瞅啥，给本小姐下载</h4>
+        <img src="assets/banner.jpg" alt="思语可爱横幅">
+      </div>
+    </div>
+  </section>
+
+  <section id="plugins" class="section">
+    <div class="win-head">
+      <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+      <span class="wh-title">02 · 技能插件 — skills.exe</span>
+      <span class="wh-min">— ▢ ×</span>
+    </div>
+    <p class="sec-sub">桌宠的技能背包，点开每一扇窗</p>
+    <div class="plugin-grid">
+      <button class="win-card" data-plugin="siyu">
+        <span class="win-ico"><svg class="ico"><use href="#i-brain"/></svg></span>
+        <b>AI 超级分身辅助</b>
+        <span class="win-desc">转交需求 · 屏幕伴读 · 会议转写 · 项目看板</span>
+      </button>
+      <button class="win-card" data-plugin="ima">
+        <span class="win-ico"><svg class="ico"><use href="#i-book"/></svg></span>
+        <b>IMA 知识库</b>
+        <span class="win-desc">检索 · 笔记 · 入库 · 体检，489 条资料随查随记</span>
+      </button>
+      <button class="win-card" data-plugin="wechat">
+        <span class="win-ico"><svg class="ico"><use href="#i-chat"/></svg></span>
+        <b>微信发送助手</b>
+        <span class="win-desc">真实发送 · 联系人纠错 · 群聊拦截 · 敏感内容确认</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="pet" class="section">
+    <div class="win-head">
+      <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+      <span class="wh-title">03 · 桌宠档案 — evolve.exe</span>
+      <span class="wh-min">— ▢ ×</span>
+    </div>
+    <p class="sec-sub">从 C 形小东西，进化成会卖萌的分身</p>
+    <div class="pet-evolve">
+      <div class="evo">
+        <svg class="coo" viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M96 48 A38 38 0 1 0 96 76" fill="none" stroke="#F5B942" stroke-width="15" stroke-linecap="round"/>
+          <g class="eyes"><circle cx="84" cy="52" r="5.5" fill="#3C3489"/><circle cx="84" cy="74" r="5.5" fill="#3C3489"/></g>
+          <line x1="50" y1="92" x2="50" y2="106" stroke="#F5B942" stroke-width="8" stroke-linecap="round"/>
+          <line x1="72" y1="92" x2="72" y2="106" stroke="#F5B942" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        <p><b>C 形小身体</b><br>Coopanion 本体 · 住在屏幕底边<br>两只圆眼 · 两条短腿 · 头顶气泡</p>
+      </div>
+      <div class="evo-arrow">→</div>
+      <div class="evo">
+        <img src="assets/siyu.png" alt="思语 Q版">
+        <p><b>Q 版分身</b><br>思语 · 数字IP形象<br>发箍 + 眼镜 + 会干活</p>
+      </div>
+      <div class="evo-arrow">→</div>
+      <div class="evo">
+        <img src="assets/poster.jpg" alt="双人海报">
+        <p><b>合体海报</b><br>一个桌宠和他的制造者<br>同框出道</p>
+      </div>
+    </div>
+    <button class="btn main" id="pokeBtn">戳一下思语 →</button>
+  </section>
+
+  <section id="downloads" class="section">
+    <div class="win-head">
+      <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+      <span class="wh-title">04 · 算法公开 & 下载 — explorer.exe</span>
+      <span class="wh-min">— ▢ ×</span>
+    </div>
+    <p class="sec-sub">把桌宠的大脑和外形，一并交到你手上</p>
+    <div class="filemgr">
+      <div class="fm-bar">
+        <svg class="ico fm-ico"><use href="#i-folder"/></svg>
+        <span>downloads</span>
+        <span class="fm-path">› 5 个文件 · 全部已脱敏</span>
+      </div>
+      <button class="fm-row" data-goto-page="algorithm.html">
+        <svg class="ico fm-ico fm-blue"><use href="#i-puzzle"/></svg>
+        <div class="fm-info">
+          <b>algorithm.html</b>
+          <span>任务连贯性算法公开版 · 在线阅读，附思维导图</span>
+        </div>
+        <span class="fm-size">网页</span>
+        <span class="fm-dl">打开 →</span>
+      </button>
+      <a class="fm-row" href="downloads/algorithm_public_pack.zip" download>
+        <svg class="ico fm-ico fm-blue"><use href="#i-doc"/></svg>
+        <div class="fm-info">
+          <b>algorithm_public_pack.zip</b>
+          <span>算法完整版 Markdown：15 步验证清单 · 记账后置 · 生效位置</span>
+        </div>
+        <span class="fm-size">5 KB</span>
+        <span class="fm-dl"><svg class="ico"><use href="#i-dl"/></svg></span>
+      </a>
+      <a class="fm-row" href="downloads/prompt_reference_pack.zip" download>
+        <svg class="ico fm-ico fm-blue"><use href="#i-wrench"/></svg>
+        <div class="fm-info">
+          <b>prompt_reference_pack.zip</b>
+          <span>四份运行时提示词全文（已脱敏），照着就能搭一套桌宠提示词体系</span>
+        </div>
+        <span class="fm-size">13 KB</span>
+        <span class="fm-dl"><svg class="ico"><use href="#i-dl"/></svg></span>
+      </a>
+      <a class="fm-row" href="downloads/laosun_figure_pack_v1.7.zip" download>
+        <svg class="ico fm-ico fm-amber"><use href="#i-camera"/></svg>
+        <div class="fm-info">
+          <b>laosun_figure_pack_v1.7.zip</b>
+          <span>老孙形象包：JS 驱动 + 分层贴图 + 缩略图，开箱即用 · GitHub 托管（SHA256 校验一致）</span>
+        </div>
+        <span class="fm-size">0.8 MB</span>
+        <span class="fm-dl"><svg class="ico"><use href="#i-github"/></svg></span>
+      </a>
+      <a class="fm-row" href="downloads/siyu_figure_pack_v4.1.zip" download>
+        <svg class="ico fm-ico fm-pink"><use href="#i-doll"/></svg>
+        <div class="fm-info">
+          <b>siyu_figure_pack_v4.1.zip</b>
+          <span>思语形象包：双套贴图 + 比例配置，19 个表情由 kit 驱动 · GitHub 托管（SHA256 校验一致）</span>
+        </div>
+        <span class="fm-size">6.4 MB</span>
+        <span class="fm-dl"><svg class="ico"><use href="#i-github"/></svg></span>
+      </a>
+      <a class="fm-row" href="https://github.com/MR-TianYuSun/coopanion-figures" target="_blank" rel="noopener">
+        <svg class="ico fm-ico fm-blue"><use href="#i-github"/></svg>
+        <div class="fm-info">
+          <b>GitHub 仓库主页</b>
+          <span>coopanion-figures · 两个形象包的源仓库，也可以在这里查看版本历史</span>
+        </div>
+        <span class="fm-size">↗</span>
+        <span class="fm-dl"><svg class="ico"><use href="#i-github"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <section id="soft" class="section">
+    <div class="win-head">
+      <div class="dots"><span class="d red"></span><span class="d yellow"></span><span class="d green"></span></div>
+      <span class="wh-title">05 · 带它回家 — setup.exe</span>
+      <span class="wh-min">— ▢ ×</span>
+    </div>
+    <p class="sec-sub">网页里的思语只是预览——Coopanion 桌宠软件才是她真正的家</p>
+    <div class="soft-grid">
+      <div class="soft-copy">
+        <h3>Coopanion · 开源 AI 桌宠软件</h3>
+        <p>一只叫 <b>Coo</b> 的小家伙住在屏幕底边：走来走去、用气泡和你说话、按住说话键听你讲。接上大模型后，它记得你说过的话——这不是屏保，是一个住在桌面上的 AI 伙伴。</p>
+        <ul class="soft-feats">
+          <li><b>会聊天</b>接 DeepSeek / 通义 / Kimi / GLM / 豆包 等，国产模型低成本起步</li>
+          <li><b>有记忆</b>它把了解到的你写进小文件，越养越懂你</li>
+          <li><b>可装扮</b>配色、帽子、眼镜、耳饰随便换——形象包导入即刻生效</li>
+          <li><b>能干活</b>授权后可读屏幕、点鼠标、帮你操作电脑（默认关闭，权限你来定）</li>
+        </ul>
+        <p class="soft-note">应用免费开源（AGPL-3.0），支持 Windows / macOS / Linux；模型服务按量计费，电脑操作权限默认全部关闭。</p>
+      </div>
+      <div class="soft-actions">
+        <a class="soft-btn main" href="https://coo.palailab.org/" target="_blank" rel="noopener">
+          <svg class="ico"><use href="#i-globe"/></svg>
+          <span><b>官方网站</b><i>coo.palailab.org</i></span>
+        </a>
+        <a class="soft-btn" href="https://github.com/Pal-AI-Lab/Coopanion/releases" target="_blank" rel="noopener">
+          <svg class="ico"><use href="#i-dl"/></svg>
+          <span><b>下载安装包</b><i>Win / macOS / Linux · Releases</i></span>
+        </a>
+        <a class="soft-btn" href="https://github.com/Pal-AI-Lab/Coopanion" target="_blank" rel="noopener">
+          <svg class="ico"><use href="#i-github"/></svg>
+          <span><b>GitHub 开源仓库</b><i>Pal-AI-Lab / Coopanion</i></span>
+        </a>
+        <a class="soft-btn" href="https://coo.palailab.org/guide/install/" target="_blank" rel="noopener">
+          <svg class="ico"><use href="#i-book"/></svg>
+          <span><b>安装指南</b><i>两种装法 · 让 AI 帮你装也行</i></span>
+        </a>
+        <p class="soft-tip">装好后在「装扮」里导入本站的思语形象包，网页上的她就住进你的电脑了。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot tray">
+    <div class="tray-bar">
+      <svg class="ico tray-ico"><use href="#i-eye"/></svg>
+      <p>制作人 · 老孙不会拍 ｜ Coopanion装扮小站</p>
+      <span class="tray-pill">OS 4.2</span>
+    </div>
+    <p class="foot-sub">Built with Coopanion · Cortico · GitHub Pages · 2026</p>
+  </footer>
+
+  <div class="taskbar">
+    <button class="start-btn" id="startBtn" aria-label="开始菜单">
+      <span class="start-logo">C</span>
+      <span>开始</span>
+    </button>
+    <div class="start-menu hidden" id="startMenu">
+      <button class="sm-item" data-goto="gallery">01 · 形象馆</button>
+      <button class="sm-item" data-goto="plugins">02 · 技能插件</button>
+      <button class="sm-item" data-goto="pet">03 · 桌宠档案</button>
+      <button class="sm-item" data-goto="downloads">04 · 算法与下载</button>
+      <button class="sm-item" data-goto="soft">05 · 带它回家</button>
+      <button class="sm-item sm-page" data-goto-page="algorithm.html">算法公开页 ↗</button>
+    </div>
+    <div class="task-pet" id="petBtn">
+      <svg id="petSmall" width="46" height="52" aria-label="思语桌宠"></svg>
+      <div class="bubble" id="bubble">萌妹拯救世界！</div>
+    </div>
+    <span class="task-text">真·思语 · 住在你的屏幕底边</span>
+    <span class="task-flex"></span>
+    <button class="music-btn" id="musicBtn" title="播放主题曲《镜头之外的光》" aria-label="播放/暂停背景音乐">
+      <svg class="ico"><use href="#i-music"/></svg>
+      <span class="music-label">主题曲</span>
+      <span class="music-bars"><i></i><i></i><i></i></span>
+    </button>
+    <button class="night-btn" id="nightBtn" title="切换夜间模式" aria-label="切换夜间模式"><svg class="ico"><use href="#i-moon"/></svg><span class="night-label">夜间</span></button>
+    <button class="share-btn" id="shareBtn" title="复制小站链接">分享小站 ⧉</button>
+  </div>
+</div>
+
+<!-- 背景音乐：本人原创短剧《老板回来了》主题曲《镜头之外的光》（Suno 生成） -->
+<audio id="bgm" src="assets/bgm.mp3" preload="auto" autoplay loop></audio>
+
+<!-- OS 系统通知：提醒桌宠软件 -->
+<div id="osNotify" class="os-notify">
+  <div class="on-head">
+    <svg class="ico on-ico"><use href="#i-home"/></svg>
+    <b>Coopanion 系统提醒</b>
+    <button id="notifyClose" aria-label="关闭">×</button>
+  </div>
+  <p class="on-text">网页里的思语只是预览 —— 想让她<b>真的住进你的电脑</b>吗？</p>
+  <div class="on-actions">
+    <button class="on-btn main" data-goto="soft">带它回家 →</button>
+    <button class="on-btn" id="notifyLater">先逛逛</button>
+  </div>
+</div>
+
+<!-- 插件弹窗 -->
+<div id="modal" class="hidden">
+  <div class="modal-win">
+    <div class="modal-bar"><span id="modalTitle">窗口</span><button id="modalClose">×</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="music.js"></script>
+<script type="module" src="petkit.js"></script>
+</body>
+</html>

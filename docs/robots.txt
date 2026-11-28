@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mr-tianyusun.github.io/coopanion-figures/sitemap.xml

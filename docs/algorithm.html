@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务连贯性与四路互斥路由算法 · 公开版</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.algo-wrap{max-width:860px;margin:0 auto;padding:48px 20px 80px}
+.algo-hero{text-align:center;margin-bottom:40px}
+.algo-hero .badge{display:inline-block;background:var(--navy);color:#fff;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:16px}
+.algo-hero h1{font-size:30px;color:var(--brown);margin-bottom:10px}
+.algo-hero p{color:#8a7a63;font-size:15px}
+.algo-card{background:#fff;border-radius:18px;padding:28px 30px;margin-bottom:22px;box-shadow:0 6px 24px rgba(107,74,43,.08);border:1px solid #F0E4CF}
+.algo-card h2{color:var(--brown);font-size:20px;margin-bottom:14px;padding-left:12px;border-left:4px solid var(--gold)}
+.algo-card h3{color:#a06a2c;font-size:16px;margin:18px 0 8px}
+.algo-card p,.algo-card li{color:#5c5142;font-size:15px;line-height:1.85}
+.algo-card ul,.algo-card ol{padding-left:22px}
+.algo-card pre{background:#2e2a3f;color:#e8e2d5;border-radius:12px;padding:18px;font-size:13px;overflow-x:auto;line-height:1.7;font-family:Consolas,monospace}
+.algo-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+.algo-table th{background:var(--cream2);color:var(--brown);padding:10px 12px;text-align:left;border-bottom:2px solid var(--gold)}
+.algo-table td{padding:10px 12px;border-bottom:1px solid #F0E4CF;color:#5c5142;line-height:1.6;vertical-align:top}
+.algo-table tr:hover td{background:#FDF8EE}
+.algo-callout{background:#FFF7E6;border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0;font-size:14px;color:#7a5c26;line-height:1.8}
+.algo-dl{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.tag-pill{display:inline-block;background:var(--cream2);color:#8a6a2f;font-size:12px;padding:3px 10px;border-radius:999px;margin:2px 4px 2px 0}
+code.inline{background:var(--cream2);color:#a04a1f;padding:2px 7px;border-radius:6px;font-size:13px;font-family:Consolas,monospace}
+@media (max-width:760px){.algo-card{padding:20px 16px}.algo-hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="algo-wrap">
+  <div class="algo-hero">
+    <span class="badge">技术公开版 · 已脱敏</span>
+    <h1>任务连贯性 × 四路互斥路由算法</h1>
+    <p>一套让 AI 智能体「做完了才收」的提示词算法，与双通道发送的互斥路由规则</p>
+    <p style="margin-top:6px">
+      <span class="tag-pill">提示词工程</span><span class="tag-pill">回合经济学</span><span class="tag-pill">路由互斥</span><span class="tag-pill">状态续跑</span>
+    </p>
+  </div>
+
+  <div class="algo-card">
+    <h2>摘要</h2>
+    <p>旧提示词把「聊天一句一收」的回合经济学套到「干活」上，导致智能体每完成一小步就结束回合，用户必须反复说「继续」。本算法不靠加大轮次上限，而是在核心提示词顶部加入最高优先级的<strong>任务连贯性总则</strong>：把结束回合的判据从「有没有话说」改成「目标有没有完成」。</p>
+    <p>同时修复两条发送通道互相压过的问题——从「微信绝对优先」的打补丁思路，改为<strong>四路互斥</strong>：只有微信信号走微信直发，只有助理信号走助理转交，两个信号同时出现只反问，都没有就正常对话。</p>
+    <p>后续全面复查定位出 14 个优化点：P0 五条留待人工判别，P1 六条与 P2 三条已全部落地，包括回合间续跑、转交前补全需求、语音错字容错、首发防线、上限收束、前缀瘦身、冗余自动核对与敏感内容首次确认。</p>
+  </div>
+
+  <div class="algo-card">
+    <h2>一 · 问题诊断</h2>
+    <h3>1. 回合被切碎：一句话为什么要说三次</h3>
+    <p>四条规则互相提供「可以收了」的合法性：</p>
+    <table class="algo-table">
+      <tr><th>规则</th><th>传达的暗示</th><th>叠加后的后果</th></tr>
+      <tr><td>一条消息一次汇报气泡，说完结束回合</td><td>说一次 = 回合结束</td><td>多步任务被切成一回合一步</td></tr>
+      <tr><td>不描述打算做什么，不写内心判断</td><td>中途不能旁白</td><td>工具间隙既不能说话也不许沉默地继续</td></tr>
+      <tr><td>沉默是正常的动作</td><td>没话说就走</td><td>被泛化到任务进行中</td></tr>
+      <tr><td>没话可说就结束回合（系统级注入）</td><td>再次强化收尾倾向</td><td>与前一条叠加</td></tr>
+    </table>
+    <div class="algo-callout">最关键的一点：原规则中<strong>没有一条反着说「目标没完成不许走」</strong>。模型在任意两个工具调用之间都有充分理由结束回合。</div>
+    <h3>2. 两条通道互相压过</h3>
+    <p>实测中「把你好发给微信文件传输助手」被连转 7 次助理转交、微信直发一次没调——转交规则压过微信直发；补「微信绝对优先」后，「提到助理」的请求又被微信抢走。单通道优先注定按下葫芦浮起瓢。</p>
+    <h3>3. 架构层放大器</h3>
+    <p>智能体是事件驱动的：每条语音是一个新事件帧（新回合）。回合内没有「目标未完成禁止结束」，回合间没有「主动续跑上次未完成目标」，回合一旦被切碎，续跑只能靠人嘴说。</p>
+  </div>
+
+  <div class="algo-card">
+    <h2>二 · 算法总览：两套经济学分开</h2>
+    <ul>
+      <li><strong>聊天场景</strong>：一句一收。没有新指令、只是被拖动被戳时，保持安静或只回半句。</li>
+      <li><strong>干活场景</strong>：做完了才收。目标未完成且还有可自主执行的下一步时，继续调工具，哪怕中间一句话都不说。</li>
+      <li>是否结束回合，由<strong>目标状态</strong>决定，不由说没说话决定。</li>
+    </ul>
+<pre>唤醒 → 形成目标 G
+循环：
+  若 G 已完成：一次完整汇报 → end_turn
+  否则若缺只有主人才能给的信息：提问 → end_turn
+  否则若命中需确认的对外动作：请求确认 → end_turn
+  否则取下一步 next：
+    若 next 存在：静默调用工具 → 回到循环
+    若 next 不存在：说明阻塞原因 → end_turn</pre>
+  </div>
+
+  <div class="algo-card">
+    <h2>三 · end_turn 三态判定</h2>
+    <table class="algo-table">
+      <tr><th>状态</th><th>判据</th><th>动作</th><th>反例</th></tr>
+      <tr><td><b>目标完成</b></td><td>要查的查完、要写的写完、要发的发出</td><td>一次完整汇报后结束</td><td>还有文件没写就说「弄好了」</td></tr>
+      <tr><td><b>缺主人独有的信息</b></td><td>确实缺一个只有本人能给的事实</td><td>提问后结束</td><td>能从上下文推断却停下来问</td></tr>
+      <tr><td><b>命中需确认的对外动作</b></td><td>对外发送 / 发布 / 删除，且对象不唯一</td><td>请求确认后结束</td><td>收件人和内容已确定还回头问</td></tr>
+    </table>
+    <p><strong>口径</strong>：能从当前对话、已读文件、待办文件、工具返回的错误或候选里推出的，一律自己推，不问。只有确实缺事实才问。</p>
+    <div class="algo-callout">结束前自检：目标完成了吗？还有没有我能自己做的下一步？只要还有下一步，就继续做——「我这一步说完了」不是结束理由。</div>
+  </div>
+
+  <div class="algo-card">
+    <h2>四 · 四路互斥表（核心）</h2>
+    <p>两条发送通道只按用户话里的信号选，绝不混用，也不许一条压过另一条。三份提示词与两个工具描述共用这张表：</p>
+    <table class="algo-table">
+      <tr><th>话里的信号</th><th>举例</th><th>直接动作</th><th>禁止动作</th></tr>
+      <tr><td><b>只有微信信号</b></td><td>微信 / 发微信 / 给谁发 / 告诉谁 / 转告 / 捎话</td><td>微信直发工具</td><td>不调转交工具、不转交、不写转交记录</td></tr>
+      <tr><td><b>只有助理信号</b></td><td>助理 / 唤醒助理 / 交给助理 / 让助理处理</td><td>助理转交工具，只回固定确认句</td><td>不调微信直发、不自行查资料、不复述需求</td></tr>
+      <tr><td><b>两个信号同时出现</b></td><td>「助理，把你好发给微信文件传输助手」</td><td>只反问「直接用微信发，还是交给助理处理？」</td><td>不猜、不默认、不两个都调</td></tr>
+      <tr><td><b>都没有</b></td><td>正常说话、提问、查资料</td><td>正常对话或对应工具</td><td>不调这两条发送工具</td></tr>
+    </table>
+    <p><strong>信号判定看是不是在下达任务</strong>：关键词本身不作数，看这句话是不是命令。「给妈妈发个微信」是命令，命中；「微信怎么又崩了」是聊天提问，不命中。判一次就动手，不为一条信号反复权衡。</p>
+    <ul>
+      <li>只说「调用微信 / 继续」而上文有未发完的微信任务 → 沿用上一条已拆好的收件人与正文直接发送，不再问、不再转交。</li>
+      <li>来源是助理的返回结果不算新指令，禁止再转回去；两者都有的先反问。</li>
+      <li>转交失败时告诉用户失败原因，不改用本地搜索或自己执行。</li>
+    </ul>
+  </div>
+
+  <div class="algo-card">
+    <h2>五 · 加固九项（P1 × 6 + P2 × 3）</h2>
+    <table class="algo-table">
+      <tr><th>编号</th><th>加固项</th></tr>
+      <tr><td>P1-6</td><td><b>回合间目标续跑</b>：新回合无新指令时，先查待办文件里标「进行中」的条目接着干</td></tr>
+      <tr><td>P1-7</td><td><b>转交前先补全需求</b>：依赖内部资料的转交先查知识库，结论写进转交内容，不甩「你自己去查」</td></tr>
+      <tr><td>P1-8</td><td><b>信号词语音错字容错</b>：错字按发音判定信号（「助力」→助理、「维信」→微信），拿不准先确认</td></tr>
+      <tr><td>P1-9</td><td><b>首发防线</b>：判错没有后悔药——判定必须做在调用之前，回执只兜底不兜首发</td></tr>
+      <tr><td>P1-10</td><td><b>接近回合上限先收束</b>：约 40 步以上把结论与下一步写进待办再简短汇报结束</td></tr>
+      <tr><td>P1-11</td><td>混合句反问后的承接链路补进验证清单</td></tr>
+      <tr><td>P2-12</td><td><b>前缀瘦身</b>：低频规则迁按需卡，核心前缀只留两条高压线，节省每轮 token</td></tr>
+      <tr><td>P2-13</td><td><b>冗余自动核对</b>：脚本一次核对运行时与交付副本八处关键句，缺一处即报警</td></tr>
+      <tr><td>P2-14</td><td><b>敏感内容首次确认</b>：金额 / 地址 / 承诺类正文先复述确认再发，日常消息直发</td></tr>
+    </table>
+  </div>
+
+  <div class="algo-card">
+    <h2>六 · 验证清单（15 步，节选）</h2>
+    <ol>
+      <li>多步任务全程不出现中途结束回合，不需要用户说「继续」</li>
+      <li>两次工具调用之间没有汇报也继续调工具，不空转、不自言自语</li>
+      <li>「给文件传输助手发条消息」→ 直接走微信直发，不转交</li>
+      <li>「让助理处理一下」→ 直接走助理转交，只回固定确认句</li>
+      <li>混合句「助理，把你好发给微信文件传输助手」→ 只反问，两个工具都不调</li>
+      <li>「微信怎么又崩了」→ 正常聊天，不调任何发送工具</li>
+      <li>助理回传「把 X 发给微信 Y」→ 直接微信直发，不再转回去</li>
+      <li>语音说「助力，帮我处理下XX」（助理错字）→ 按发音判为助理信号</li>
+      <li>长任务跑到约 40 步 → 触发收束：待办标「进行中 + 下一步」，新回合能续跑</li>
+    </ol>
+    <p>完整 15 步见下载包。</p>
+  </div>
+
+  <div class="algo-card">
+    <h2>七 · 全景思维导图</h2>
+    <p>完整算法共 8 大分支 107 节点（含 11-26 可靠性加固）。<strong>点任意带子节点的方块展开 / 收起</strong>，拖动空白处平移，右上角按钮缩放与复位：</p>
+    <div id="mindmap"></div>
+    <p style="font-size:12px;color:#a08f76;margin-top:8px">配色对应分支：点开方块后，同色线段连接其子节点。第 ⑧ 支为最新一轮修复。</p>
+  </div>
+
+  <div class="algo-card">
+    <h2>八 · 边界与红线</h2>
+    <ul>
+      <li>收件人、内容、目标能唯一确定时直接执行；存在歧义、后果不可逆且对象不明确时才停下确认。</li>
+      <li>修改既有文件前先备份，批量修改用前后对照表交代。</li>
+      <li>引用知识库内容时不输出手机号、学号、住址、证件号、密码、验证码。</li>
+      <li>只用工具表里真实存在的工具；没有的能力就说没有，不假装查过，不编造路径。</li>
+    </ul>
+  </div>
+
+  <div class="algo-card">
+    <h2>九 · 获取完整资料</h2>
+    <p>打包文件与在线页面同源：完整算法文档、运行时提示词参考（已脱敏）、本页思维导图数据，以及 2026-11-26 最新一轮提示词更新记录。</p>
+    <div class="algo-dl">
+      <a class="btn main" href="prompts/UPDATE-2026-11-26.md" target="_blank">🆕 提示词更新记录（11-26）</a>
+      <a class="btn main" href="prompts/CONSTITUTION.md" target="_blank">📄 核心提示词 CONSTITUTION</a>
+      <a class="btn main" href="prompts/ORIENTATION.md" target="_blank">📄 运行前缀 ORIENTATION</a>
+      <a class="btn" href="algorithm.md" target="_blank">📄 算法总文档</a>
+      <a class="btn" href="mindmap.md" target="_blank">🧠 思维导图 86 节点</a>
+      <a class="btn" href="downloads/algorithm_public_pack.zip" download>⬇ 算法文档包</a>
+      <a class="btn" href="downloads/prompt_reference_pack.zip" download>⬇ 提示词参考包（脱敏版）</a>
+      <a class="btn" href="https://github.com/MR-TianYuSun/coopanion-figures/tree/main/docs" target="_blank" rel="noopener">GitHub · 算法体系源文档 ↗</a>
+      <a class="btn" href="index.html">← 回到主页</a>
+    </div>
+    <div class="algo-callout" style="margin-top:16px">本页为技术公开版：已去除真名、账号标识、内部知识库 ID、第三方人名与本地路径，「主人」泛指智能体的使用者。</div>
+  </div>
+
+  <footer class="foot" style="margin-top:30px">
+    <p>Coopanion 提示词算法 · 技术公开文档 ｜ Coopanion装扮小站</p>
+    <p class="foot-sub">Task Continuity × Four-way Exclusive Routing · 2026</p>
+  </footer>
+</div>
+<script src="mindtree.js"></script>
+<script src="mindmap.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('mindmap');
+  if (el && window.MINDTREE && window.MindMap) new window.MindMap(el, window.MINDTREE);
+})();
+</script>
+<style>
+#mindmap{margin-top:10px}
+.mm-viewport{position:relative;border:1px solid #F0E4CF;border-radius:14px;background:#FFFDF8;overflow:auto}
+.mm-toolbar{position:sticky;top:0;left:0;z-index:20;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,253,248,.96);border-bottom:1px solid #F0E4CF;backdrop-filter:blur(4px)}
+.mm-title{font-weight:700;color:var(--brown);font-size:14px}
+.mm-spacer{flex:1}
+.mm-toolbar button{font:inherit;font-size:12px;padding:5px 10px;border:1px solid #E3D3AC;background:#fff;color:#7a5c26;border-radius:8px;cursor:pointer;transition:.15s}
+.mm-toolbar button:hover{background:var(--cream2);border-color:var(--gold)}
+.mm-zoomval{font-size:12px;color:#a08f76;min-width:38px;text-align:center}
+.mm-stage{position:relative;height:660px;overflow:auto;cursor:grab;touch-action:none}
+.mm-stage.mm-dragging{cursor:grabbing}
+.mm-sizer{position:relative;pointer-events:none;width:1px;height:1px}
+.mm-canvas{position:absolute;left:0;top:0;transform-origin:0 0}
+.mm-lines{position:absolute;left:0;top:0;pointer-events:none}
+.mm-nodes{position:absolute;left:0;top:0}
+.mm-node{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #EDE2CC;border-left:5px solid var(--c,#C9A96A);border-radius:9px;padding:8px 12px;font-size:13px;line-height:1.5;color:#5c5142;box-shadow:0 2px 8px rgba(107,74,43,.07);user-select:none}
+.mm-node span{display:block}
+.mm-root{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;font-size:15px;text-align:center;padding:14px 12px;border-left:5px solid var(--gold)}
+.mm-branch{font-weight:700;color:var(--brown);font-size:14px;cursor:pointer}
+.mm-haskids{cursor:pointer}
+.mm-haskids:hover{border-color:var(--c);box-shadow:0 4px 12px rgba(107,74,43,.14)}
+.mm-haskids:after{content:" −";color:var(--c);font-weight:700;opacity:.7}
+.mm-collapsed:after{content:" +"}
+@media (max-width:760px){.mm-stage{height:520px}.mm-node{font-size:12px;padding:6px 9px}.mm-title{width:100%}}
+</style>
+</body>
+</html>
